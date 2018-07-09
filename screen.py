@@ -8,8 +8,8 @@ class Screen:
     """Air quality monitor screen."""
 
     _BUFFER_SIZE = epaper2in9.EPD_WIDTH * epaper2in9.EPD_HEIGHT // 8
-    _SMALL_SCALE = 0.5
-    _LARGE_SCALE = 1.6
+    _SMALL_SCALE = 0.6
+    _LARGE_SCALE = 1.5
 
     def __init__(self, config):
         """Create with the supplied configuration."""
@@ -37,32 +37,32 @@ class Screen:
                      display.BLACK, display.PEN_MEDIUM)
 
     def _add_temperature(self, temperature):
-        text = "Temperature"
-        self._write_text(text, 2, 115, self._SMALL_SCALE)
-        value = "%dC" % int(temperature)
-        self._write_text(value, 5, 75, self._LARGE_SCALE)
+        self._write_title_text("Temperature", 2, 113)
+        self._write_value_text("%dC" % int(temperature), 5, 70)
 
     def _add_humidity(self, humidity):
-        text = "Relative Humidity"
-        self._write_text(text, 150, 115, self._SMALL_SCALE)
-        value = "%d%%" % int(humidity)
-        self._write_text(value, 158, 75, self._LARGE_SCALE)
+        self._write_title_text("Humidity", 152, 113)
+        self._write_value_text("%d%%" % int(humidity), 158, 70)
 
     def _add_co2(self, co2):
-        text = "eCO2 ppm"
-        self._write_text(text, 2, 50, self._SMALL_SCALE)
-        value = "%d" % co2
-        self._write_text(value, 10, 10, self._LARGE_SCALE)
+        # 400ppm to 8192ppm
+        self._write_title_text("eCO2 ppm", 2, 48)
+        self._write_value_text("%d" % co2, 10, 5)
 
     def _add_voc(self, voc):
-        text = "TVOC ppb"
-        self._write_text(text, 150, 50, self._SMALL_SCALE)
-        value = "%d" % voc
-        self._write_text(value, 158, 10, self._LARGE_SCALE)
+        # 0ppb to 1187ppb
+        self._write_title_text("TVOC ppb", 152, 48)
+        self._write_value_text("%d" % voc, 158, 5)
 
-    def _write_text(self, text, x, y, scale):
+    def _write_title_text(self, text, x, y):
+        self._write_text(text, x, y, self._SMALL_SCALE, display.PEN_MEDIUM)
+
+    def _write_value_text(self, text, x, y):
+        self._write_text(text, x, y, self._LARGE_SCALE, display.PEN_MEDIUM)
+
+    def _write_text(self, text, x, y, scale, pen):
         display.write_text(self.buffer, text, x, y, display.BLACK,
-                           scale, scale, None, display.PEN_MEDIUM)
+                           scale, scale, None, pen)
 
     def _update_screen(self):
         self.e.set_frame_memory(self.buffer, 0, 0, epaper2in9.EPD_WIDTH,
