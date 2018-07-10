@@ -1,9 +1,9 @@
-"""2.9 inch E-Paper display buffer writing."""
+"""2.9 inch E-Paper display buffer."""
 import hershey
 
 
-class Display:
-    """2.9 inch E-Paper display buffer writing."""
+class Buffer:
+    """2.9 inch E-Paper display buffer."""
 
     WHITE = 255
     BLACK = 0
@@ -13,29 +13,30 @@ class Display:
     PEN_THICK = 2
 
     def __init__(self, width, height):
-        """Construct buffer writer with width and height of Waveshare."""
+        """Construct buffer with width and height of Waveshare display."""
         self.w = width
         self.h = height
+        self.buffer = bytearray(width * height // 8)
 
-    def background(self, frame, col):
-        """Set background."""
+    def background(self, colour):
+        """Set background colour of the display."""
         for i in range(0, 16 * self.h):
-            frame[i] = col
+            self.buffer[i] = colour
 
-    def plot(self, frame, x, y, col):
-        """Plot point."""
+    def plot(self, x, y, colour):
+        """Plot point with the given colour."""
         tx = y
         ty = x
 
         if (x < 0) or (x >= self.h) or (y < 0) or (y >= self.w):
             return
-        if col == self.WHITE:
-            frame[int((tx+ty*self.w)/8)] |= (0x80 >> (tx % 8))
-        elif col == self.BLACK:
-            frame[int((tx+ty*self.w)/8)] &= ~(0x80 >> (tx % 8))
+        if colour == self.WHITE:
+            self.buffer[int((tx+ty*self.w)/8)] |= (0x80 >> (tx % 8))
+        elif colour == self.BLACK:
+            self.buffer[int((tx+ty*self.w)/8)] &= ~(0x80 >> (tx % 8))
 
-    def line(self, frame, x, y, x2, y2, col, weight):
-        """Draw line."""
+    def line(self, x, y, x2, y2, colour, weight):
+        """Draw line with the given colour and weight."""
         if x > x2:
             dx = x - x2
         else:
@@ -58,18 +59,18 @@ class Display:
         err = dx - dy
 
         while True:
-            self.plot(frame, x, y, col)
+            self.plot(x, y, colour)
             if weight == self.PEN_MEDIUM:
                 if self.h-1 >= x+1:
-                    self.plot(frame, x+1, y, col)
+                    self.plot(x+1, y, colour)
                 if 0 <= x-1:
-                    self.plot(frame, x-1, y, col)
+                    self.plot(x-1, y, colour)
                 if self.w-1 >= y+1:
-                    self.plot(frame, x, y+1, col)
+                    self.plot(x, y+1, colour)
                 if 0 <= y-1:
-                    self.plot(frame, x, y-1, col)
+                    self.plot(x, y-1, colour)
             elif weight == self.PEN_THICK:
-                self.blob(frame, x, y, col)
+                self.blob(x, y, colour)
 
             if (x == x2) and (y == y2):
                 break
@@ -78,34 +79,34 @@ class Display:
                 err = err-dy
                 x = x+sx
             if (x == x2) and (y == y2):
-                self.plot(frame, x, y, col)
+                self.plot(x, y, colour)
                 if weight == self.PEN_MEDIUM:
                         if self.h-1 >= x+1:
-                            self.plot(frame, x+1, y, col)
+                            self.plot(x+1, y, colour)
                         if 0 <= x-1:
-                            self.plot(frame, x-1, y, col)
+                            self.plot(x-1, y, colour)
                         if self.w-1 >= y+1:
-                            self.plot(frame, x, y+1, col)
+                            self.plot(x, y+1, colour)
                         if 0 <= y-1:
-                            self.plot(frame, x, y-1, col)
+                            self.plot(x, y-1, colour)
                 elif weight == self.PEN_THICK:
-                    self.blob(frame, x, y, col)
+                    self.blob(x, y, colour)
                 break
 
             if e2 < dx:
                 err = err+dx
                 y = y+sy
 
-    def blob(self, frame, x, y, col):
-        """Draw blob."""
-        self.line(frame, x-1, y+2,  x+1, y+2, col, self.PEN_THIN)
-        self.line(frame, x-2, y+1,  x+2, y+1, col, self.PEN_THIN)
-        self.line(frame, x-2, y,  x+2, y, col, self.PEN_THIN)
-        self.line(frame, x-2, y-1,  x+2, y-1, col, self.PEN_THIN)
-        self.line(frame, x-1, y-2,  x+1, y-2, col, self.PEN_THIN)
+    def blob(self, x, y, colour):
+        """Draw blob with the given colour."""
+        self.line(x-1, y+2,  x+1, y+2, colour, self.PEN_THIN)
+        self.line(x-2, y+1,  x+2, y+1, colour, self.PEN_THIN)
+        self.line(x-2, y,  x+2, y, colour, self.PEN_THIN)
+        self.line(x-2, y-1,  x+2, y-1, colour, self.PEN_THIN)
+        self.line(x-1, y-2,  x+1, y-2, colour, self.PEN_THIN)
 
-    def write_text(self, frame, text, x, y, col, xscale, yscale, dy, weight):
-        """Write text."""
+    def write_text(self, text, x, y, colour, xscale, yscale, dy, weight):
+        """Write text with the given colour and size scaling."""
         old = False
         do_scale = False
         not_finished = True
@@ -166,7 +167,7 @@ class Display:
                         if ((ox+xx) > (self.h-1)) or ((px+xx) > (self.h-1)):
                             not_finished = False
                             break
-                        self.line(frame, ox+xx, oy+y, px+xx, py+y, col, weight)
+                        self.line(ox+xx, oy+y, px+xx, py+y, colour, weight)
                         ox = px
                         oy = py
                     else:
@@ -185,3 +186,7 @@ class Display:
         #     *dy = mdy
 
         return wt+1
+
+    def get(self):
+        """Get the filled in buffer."""
+        return self.buffer
