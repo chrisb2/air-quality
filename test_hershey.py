@@ -1,7 +1,7 @@
 """Test Hershey font."""
 import epaper2in9
 from machine import SPI, Pin
-import display
+from display_buffer import Buffer
 
 w = 128
 h = 296
@@ -17,12 +17,9 @@ busy = Pin(32)
 e = epaper2in9.EPD(spi, cs, dc, rst, busy)
 e.init()
 
-buf = bytearray(128 * 296 // 8)
-display.background(buf, display.WHITE)
-display.write_text(buf, 'lmnopqr', 0, 20, display.BLACK, 2.0, 2.0,
-                   None, display.PEN_MEDIUM)
-e.set_frame_memory(buf, x, y, w, h)
+buffer = Buffer(128, 296)
+buffer.background(buffer.WHITE)
+buffer.write_text(':?/|\\', 0, 60, buffer.BLACK, 1.0, 1.0,
+                  None, buffer.PEN_MEDIUM)
+e.set_frame_memory(buffer.get(), x, y, w, h)
 e.display_frame()
-
-display.plot(buf, 10, 10, display.BLACK)
-display.blob(buf, 10, 10, display.BLACK)
