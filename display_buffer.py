@@ -14,26 +14,26 @@ class Buffer:
 
     def __init__(self, width, height):
         """Construct buffer with width and height of Waveshare display."""
-        self.w = width
-        self.h = height
-        self.buffer = bytearray(width * height // 8)
+        self._w = width
+        self._h = height
+        self._buffer = bytearray(width * height // 8)
 
     def background(self, colour):
         """Set background colour of the display."""
-        for i in range(0, 16 * self.h):
-            self.buffer[i] = colour
+        for i in range(0, 16 * self._h):
+            self._buffer[i] = colour
 
     def plot(self, x, y, colour):
         """Plot point with the given colour."""
         tx = y
         ty = x
 
-        if (x < 0) or (x >= self.h) or (y < 0) or (y >= self.w):
+        if (x < 0) or (x >= self._h) or (y < 0) or (y >= self._w):
             return
         if colour == self.WHITE:
-            self.buffer[int((tx+ty*self.w)/8)] |= (0x80 >> (tx % 8))
+            self._buffer[int((tx+ty*self._w)/8)] |= (0x80 >> (tx % 8))
         elif colour == self.BLACK:
-            self.buffer[int((tx+ty*self.w)/8)] &= ~(0x80 >> (tx % 8))
+            self._buffer[int((tx+ty*self._w)/8)] &= ~(0x80 >> (tx % 8))
 
     def line(self, x, y, x2, y2, colour, weight):
         """Draw line with the given colour and weight."""
@@ -61,11 +61,11 @@ class Buffer:
         while True:
             self.plot(x, y, colour)
             if weight == self.PEN_MEDIUM:
-                if self.h-1 >= x+1:
+                if self._h-1 >= x+1:
                     self.plot(x+1, y, colour)
                 if 0 <= x-1:
                     self.plot(x-1, y, colour)
-                if self.w-1 >= y+1:
+                if self._w-1 >= y+1:
                     self.plot(x, y+1, colour)
                 if 0 <= y-1:
                     self.plot(x, y-1, colour)
@@ -81,11 +81,11 @@ class Buffer:
             if (x == x2) and (y == y2):
                 self.plot(x, y, colour)
                 if weight == self.PEN_MEDIUM:
-                        if self.h-1 >= x+1:
+                        if self._h-1 >= x+1:
                             self.plot(x+1, y, colour)
                         if 0 <= x-1:
                             self.plot(x-1, y, colour)
-                        if self.w-1 >= y+1:
+                        if self._w-1 >= y+1:
                             self.plot(x, y+1, colour)
                         if 0 <= y-1:
                             self.plot(x, y-1, colour)
@@ -164,7 +164,7 @@ class Buffer:
                     old = False
                 else:
                     if old:  # a previous point is stored in ox, oy
-                        if ((ox+xx) > (self.h-1)) or ((px+xx) > (self.h-1)):
+                        if ((ox+xx) > (self._h-1)) or ((px+xx) > (self._h-1)):
                             not_finished = False
                             break
                         self.line(ox+xx, oy+y, px+xx, py+y, colour, weight)
@@ -181,12 +181,11 @@ class Buffer:
                 xx = xx+w
                 wt = wt+w
 
-        # TODO *dy
-        # if dy is not None:
-        #     *dy = mdy
+        if dy is not None:
+            dy = mdy
 
         return wt+1
 
     def get(self):
         """Get the filled in buffer."""
-        return self.buffer
+        return self._buffer

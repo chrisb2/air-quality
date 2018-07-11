@@ -18,10 +18,10 @@ class Screen:
         """Create with the supplied configuration."""
         spi = SPI(-1, baudrate=config.baudrate,
                   sck=config.sck, mosi=config.mosi, miso=config.miso)
-        self.e = epaper2in9.EPD(spi, config.cs, config.dc,
-                                config.rst, config.busy)
-        self.e.init()
-        self.buffer = Buffer(epaper2in9.EPD_WIDTH, epaper2in9.EPD_HEIGHT)
+        self._e = epaper2in9.EPD(spi, config.cs, config.dc,
+                                 config.rst, config.busy)
+        self._e.init()
+        self._buffer = Buffer(epaper2in9.EPD_WIDTH, epaper2in9.EPD_HEIGHT)
 
     def update(self, temperature, humidity, co2, voc):
         """Update the screen with the supplied readings."""
@@ -33,15 +33,15 @@ class Screen:
         self._update_screen()
 
     def _add_borders(self):
-        self.buffer.background(self.buffer.WHITE)
+        self._buffer.background(self._buffer.WHITE)
         self._add_line(0, self._HALF_WIDTH,
                        epaper2in9.EPD_HEIGHT, self._HALF_WIDTH)
         self._add_line(self._HALF_HEIGHT, 0,
                        self._HALF_HEIGHT, epaper2in9.EPD_WIDTH)
 
     def _add_line(self, x1, y1, x2, y2):
-        self.buffer.line(x1, y1, x2, y2,
-                         self.buffer.BLACK, self.buffer.PEN_MEDIUM)
+        self._buffer.line(x1, y1, x2, y2,
+                          self._buffer.BLACK, self._buffer.PEN_MEDIUM)
 
     def _add_temperature(self, temperature):
         self._write_title_text("Temperature", 2, 113)
@@ -62,16 +62,16 @@ class Screen:
         self._write_value_text("%d" % voc, 158, 5)
 
     def _write_title_text(self, text, x, y):
-        self._write_text(text, x, y, self._SMALL_TEXT, self.buffer.PEN_MEDIUM)
+        self._write_text(text, x, y, self._SMALL_TEXT, self._buffer.PEN_MEDIUM)
 
     def _write_value_text(self, text, x, y):
-        self._write_text(text, x, y, self._LARGE_TEXT, self.buffer.PEN_MEDIUM)
+        self._write_text(text, x, y, self._LARGE_TEXT, self._buffer.PEN_MEDIUM)
 
     def _write_text(self, text, x, y, scale, pen):
-        self.buffer.write_text(text, x, y, self.buffer.BLACK,
-                               scale, scale, None, pen)
+        self._buffer.write_text(text, x, y, self._buffer.BLACK,
+                                scale, scale, None, pen)
 
     def _update_screen(self):
-        self.e.set_frame_memory(self.buffer.get(), 0, 0, epaper2in9.EPD_WIDTH,
-                                epaper2in9.EPD_HEIGHT)
-        self.e.display_frame()
+        self._e.set_frame_memory(self._buffer.get(), 0, 0,
+                                 epaper2in9.EPD_WIDTH, epaper2in9.EPD_HEIGHT)
+        self._e.display_frame()
