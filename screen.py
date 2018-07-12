@@ -23,13 +23,14 @@ class Screen:
         self._e.init()
         self._buffer = Buffer(epaper2in9.EPD_WIDTH, epaper2in9.EPD_HEIGHT)
 
-    def update(self, temperature, humidity, co2, voc):
+    def update(self, temperature, humidity, co2, voc, voltage):
         """Update the screen with the supplied readings."""
         self._add_borders()
         self._add_temperature(temperature)
         self._add_humidity(humidity)
         self._add_co2(co2)
         self._add_voc(voc)
+        self._add_voltage(voltage)
         self._update_screen()
 
     def _add_borders(self):
@@ -60,6 +61,10 @@ class Screen:
         # 0ppb to 1187ppb
         self._write_title_text("TVOC ppb", 152, 48)
         self._write_value_text("%d" % voc, 158, 5)
+
+    def _add_voltage(self, voltage):
+        if voltage is not None:
+            self._write_title_text("%.1fV" % voltage, 252, 113)
 
     def _write_title_text(self, text, x, y):
         self._write_text(text, x, y, self._SMALL_TEXT, self._buffer.PEN_MEDIUM)
