@@ -8,6 +8,7 @@ class Screen:
     """Air quality monitor screen."""
 
     # Text size scales
+    _TINY_TEXT = 0.3
     _SMALL_TEXT = 0.6
     _LARGE_TEXT = 1.5
     # Screen
@@ -64,7 +65,12 @@ class Screen:
 
     def _add_voltage(self, voltage):
         if voltage is not None:
-            self._write_title_text("%.1fV" % voltage, 252, 113)
+            self._buffer.line(272, 118, 272, epaper2in9.EPD_WIDTH,
+                              self._buffer.BLACK, self._buffer.PEN_THIN)
+            self._buffer.line(272, 118, epaper2in9.EPD_HEIGHT, 118,
+                              self._buffer.BLACK, self._buffer.PEN_THIN)
+            self._write_text("%.1fV" % voltage, 274, 120, self._TINY_TEXT,
+                             self._buffer.PEN_THIN)
 
     def _write_title_text(self, text, x, y):
         self._write_text(text, x, y, self._SMALL_TEXT, self._buffer.PEN_MEDIUM)
