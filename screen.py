@@ -20,7 +20,7 @@ class Screen:
         spi = SPI(-1, baudrate=config.baudrate,
                   sck=config.sck, mosi=config.mosi, miso=config.miso)
         self._e = epaper2in9.EPD(spi, config.cs, config.dc,
-                                 config.rst, config.busy)
+                                 config.rst1, config.busy)
         self._e.init()
         self._buffer = Buffer(epaper2in9.EPD_WIDTH, epaper2in9.EPD_HEIGHT)
 
