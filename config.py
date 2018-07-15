@@ -11,14 +11,15 @@ dc = Pin(4)  # Marked DC on Waveshare
 rst1 = Pin(16)  # Marked RST on Waveshare
 busy = Pin(17)  # Marked BUSY on Waveshare
 
-# BME-280 and CCS-811
-scl = Pin(34)
-sda = Pin(32)
-wake = Pin(33)  # CSS-811 only
-int = Pin(25)  # CSS-811 only
-rst2 = Pin(26)  # CSS-811 only
+# BME-280 and CCS811
+scl = Pin(26)
+sda = Pin(25)
+# Following are CCS811 only
+wake = Pin(33, Pin.OUT)
+int = Pin(34, Pin.IN, Pin.PULL_UP)  # pulled down by CCS811
+rst2 = Pin(32, Pin.OUT)
 
 # Control Switches (sw1 is power)
-sw2 = Pin(14)
+sw2 = Pin(13)
 sw3 = Pin(12)
-sw4 = Pin(13)
+sw4 = Pin(14)
