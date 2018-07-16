@@ -79,7 +79,6 @@ class CCS811:
     def _read(self):
         # datasheet Figure 14: Algorithm Register Byte Order (0x02)
         register = self.__read_register(self.__DATA_REG, 4)
-        # register = self._i2c.readfrom_mem(self._addr, 0x02, 4)
         co2HB = register[0]
         co2LB = register[1]
         tVOCHB = register[2]
@@ -89,17 +88,16 @@ class CCS811:
 
     def get_baseline(self):
         """Get the current baseline value."""
-        register = self._i2c.readfrom_mem(self._addr, self.__BASELINE_REG, 2)
+        register = self.__read_register(self.__BASELINE_REG, 2)
         HB = register[0]
         LB = register[1]
-        #  baseline = (HB << 8) | LB
-        return HB, LB
+        return (HB << 8) | LB
 
-    def put_baseline(self, HB, LB):
-        """Set the baseline values."""
+    def put_baseline(self, baseline):
+        """Set the baseline value."""
         register = bytearray([0x00, 0x00])
-        register[0] = HB
-        register[1] = LB
+        register[0] = baseline >> 8
+        register[1] = baseline & 0xff
         self.__write_register(self.__BASELINE_REG, register)
 
     def put_envdata(self, humidity, temp):

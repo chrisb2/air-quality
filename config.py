@@ -13,13 +13,13 @@ busy = Pin(17)  # Marked BUSY on Waveshare
 
 # BME-280 and CCS811
 scl = Pin(26)
-sda = Pin(25)
+sda = Pin(27)
 # Following are CCS811 only
 wake = Pin(33, Pin.OUT)
 int = Pin(34, Pin.IN, Pin.PULL_UP)  # pulled down by CCS811
-rst2 = Pin(32, Pin.OUT)
+rst2 = Pin(25, Pin.OUT)
 
-# Control Switches (sw1 is power)
-sw2 = Pin(13)
-sw3 = Pin(12)
-sw4 = Pin(14)
+# Control Switches (sw4 is power)
+sw1 = Pin(14)
+sw2 = Pin(12)
+sw3 = Pin(13)
