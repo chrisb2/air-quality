@@ -34,6 +34,10 @@ class Screen:
         self._add_voltage(voltage)
         self._update_screen()
 
+    def sleep(self):
+        """Put the screen into low current mode."""
+        self._e.sleep()
+
     def _add_borders(self):
         self._buffer.background(self._buffer.WHITE)
         self._add_line(0, self._HALF_WIDTH,

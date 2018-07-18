@@ -19,6 +19,9 @@ wake = Pin(33, Pin.OUT)
 int = Pin(34, Pin.IN, Pin.PULL_UP)  # pulled down by CCS811
 rst2 = Pin(25, Pin.OUT)
 
+# Battery measurement pin on Lolin D32 development board
+battery = Pin(35)
+
 # Control Switches (sw4 is power)
 sw1 = Pin(14)
 sw2 = Pin(12)
