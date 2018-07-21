@@ -51,11 +51,11 @@ class Screen:
 
     def _add_temperature(self, temperature):
         self._write_title_text("Temperature", 2, 113)
-        self._write_value_text("%dC" % int(temperature), 5, 70)
+        self._write_value_text("%dC" % int(round(temperature)), 5, 70)
 
     def _add_humidity(self, humidity):
         self._write_title_text("Humidity", 152, 113)
-        self._write_value_text("%d%%" % int(humidity), 158, 70)
+        self._write_value_text("%d%%" % int(round(humidity)), 158, 70)
 
     def _add_co2(self, co2):
         # 400ppm to 8192ppm

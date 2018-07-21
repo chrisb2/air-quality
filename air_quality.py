@@ -9,12 +9,14 @@ import esp32
 from ccs811 import CCS811
 import bme280
 from screen import Screen
+import battery
 import config
 
 i2c = machine.I2C(scl=config.scl, sda=config.sda, freq=100000)
 bme = bme280.BME280(i2c=i2c, mode=bme280.BME280_OSAMPLE_4)
 rtc = machine.RTC()
 scr = Screen(config)
+bat = battery.Battery(config.battery)
 
 
 def run():
@@ -31,8 +33,7 @@ def run():
             ccs.read()
             t, p, h = bme.read_data()
             ccs.put_envdata(t, h)
-            # read battery voltage
-            scr.update(t, h, ccs.eco2, ccs.tvoc, None)
+            scr.update(t, h, ccs.eco2, ccs.tvoc, bat.volts())
             # if wake count > 20: # 20mins
             #     put baseline to ccs811
             print('eCO2: %dppm, TVOC: %dppb, %.1fC, %.1f%%RH' %
@@ -40,7 +41,7 @@ def run():
         except OSError as e:
             print(e)
 
-    # put screen to sleep
+    scr.sleep()
     esp32.wake_on_ext0(pin=config.int, level=0)
     machine.deepsleep()
 
