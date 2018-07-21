@@ -7,7 +7,7 @@ import binascii
 
 ADDRESS = 0x5A
 
-i2c = I2C(scl=config.scl, sda=config.sda, freq=1000000)
+i2c = I2C(scl=config.scl, sda=config.sda, freq=100000)
 
 
 def firmware_upgrade(firmware_file):

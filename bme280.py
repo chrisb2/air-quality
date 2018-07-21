@@ -190,10 +190,18 @@ class BME280:
 
         return array("i", (temp, pressure, humidity))
 
+    def read_data(self):
+        """Read data as tuple of float values (C, hPa, %RH)."""
+        t, p, h = self.read_compensated_data()
+        temp = t / 100
+        hum = h / 1024
+        pressure = p / 256 / 100
+
+        return (temp, pressure, hum)
+
     @property
     def values(self):
         """ human readable values """
-
         t, p, h = self.read_compensated_data()
 
         p = p // 256

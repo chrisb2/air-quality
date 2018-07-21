@@ -4,6 +4,7 @@ CCS811 Indoor Air Quality Sensor.
 Based on CCS811 datasheet. Inspired by Adafruit and Sparkfun libraries
 """
 import logging
+import utime
 from micropython import const
 
 
@@ -21,7 +22,10 @@ class CCS811:
     __DATA_REG = 0x02
     __ENV_REG = 0x05
     __BASELINE_REG = 0x11
+    __HARDWARE_ID_REG = 0x20
     __ERROR_REG = 0xe0
+    __APP_START_REG = 0xf4
+    __RESET_REG = 0xff
 
     __DEVICE_MSG = 'CCS811 not found, check wiring, pull nWake to GND'
     __APPLICATION_MSG = 'Application not valid'
@@ -35,22 +39,23 @@ class CCS811:
         self._addr = address
         self._tVOC = 0
         self._eCO2 = 0
-        self._mode = mode
-        self._error = False
+
         logging.basicConfig(level=log_level)
         self._log = logging.getLogger("ccs811")
 
+        utime.sleep_ms(20)  # tSTART, figure 7 of datasheet
         self._validate_device_present()
         self._validate_hardware()
         self._validate_application_present()
-        self._start_application()
-        self._set_mode(mode)
+        if mode is not None:
+            self._start_application()
+            self._set_mode(mode)
 
     @property
     def tvoc(self):
         """Total Volatile Organic Compound in parts per billion (ppb).
 
-        Clipped to 0 to 1187 ppb.
+        Clipped to 0 to 32768ppb.
         """
         return self._tVOC
 
@@ -58,7 +63,7 @@ class CCS811:
     def eco2(self):
         """Equivalent Carbon Dioxide in parts per million (ppm).
 
-        Clipped to 400 to 8192ppm.
+        Clipped to 400 to 32768ppm.
         """
         return self._eCO2
 
@@ -67,7 +72,7 @@ class CCS811:
         status = self._read_status()
         # bit 3 in the status register: data_ready
         if (status[0] >> 3) & 0x01:
-            self._read()
+            self.read()
             return True
         else:
             return False
@@ -76,7 +81,11 @@ class CCS811:
         """Return human readable values."""
         return 'eCO2: %d ppm, tVOC: %d ppb' % (self.eco2, self.tvoc)
 
-    def _read(self):
+    def read(self):
+        """Read data.
+
+        Use this method after receiving an interrupt from nINT pin.
+        """
         # datasheet Figure 14: Algorithm Register Byte Order (0x02)
         register = self.__read_register(self.__DATA_REG, 4)
         co2HB = register[0]
@@ -113,6 +122,22 @@ class CCS811:
         envregister[3] = t_comb & 0xFF
         self.__write_register(self.__ENV_REG, envregister)
 
+    def hard_reset(self, reset_pin):
+        """Hard reset using reset pin."""
+        # tDRESET, tRESET, figure 7 in datasheet
+        if reset_pin is not None:
+            reset_pin.value(0)
+            utime.sleep_ms(1)  #
+            reset_pin.value(1)
+            utime.sleep_ms(2)  # tSTART, figure 7 in datasheet
+
+    def soft_reset(self):
+        """Software reset the device."""
+        # Figure 11 in datasheet
+        self.__write_register(self.__RESET_REG,
+                              bytearray([0x11, 0xe5, 0x72, 0x8a]))
+        utime.sleep_ms(2)  # tSTART, figure 7 in datasheet
+
     def _validate_device_present(self):
         # Check if sensor is available at i2c bus address
         devices = self._i2c.scan()
@@ -120,16 +145,14 @@ class CCS811:
             raise ValueError(self.__DEVICE_MSG)
 
     def _validate_hardware(self):
-        # See figure 22 in datasheet: Bootloader Register Map
-        # Check HW_ID register (0x20) - correct value 0x81
-        # hardware_id = self._i2c.readfrom_mem(self._addr, 0x20, 1)
-        # if (hardware_id[0] != 0x81):
-        #     raise ValueError('Wrong Hardware ID.')
-        pass
+        # HW_ID, figure 22 in datasheet
+        hardware_id = self.__read_register(self.__HARDWARE_ID_REG, 1)
+        if hardware_id[0] != 0x81:
+            raise ValueError('Wrong Hardware ID.')
 
     def _start_application(self):
-        # Application start. Write with no data to App_Start (0xf4)
-        self._i2c.writeto(self._addr, bytearray([0xf4]))
+        self._i2c.writeto(self._addr, bytearray([self.__APP_START_REG]))
+        utime.sleep_ms(1)  # tAPP_START, Figure 7 of datasheet
 
     def _validate_application_present(self):
         # Check Status Register (0x00) to see if valid application present-
