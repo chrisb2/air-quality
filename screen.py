@@ -25,7 +25,7 @@ class Screen:
         self._e.set_lut(self._e.LUT_PARTIAL_UPDATE)
         self._buffer = Buffer(epaper2in9.EPD_WIDTH, epaper2in9.EPD_HEIGHT)
 
-    def update(self, temperature, humidity, co2, voc, voltage):
+    def update(self, temperature, humidity, co2, voc, voltage, fullupdate=False):
         """Update the screen with the supplied readings."""
         self._add_borders()
         self._add_temperature(temperature)
@@ -33,7 +33,7 @@ class Screen:
         self._add_co2(co2)
         self._add_voc(voc)
         self._add_voltage(voltage)
-        self._update_screen()
+        self._update_screen(fullupdate)
 
     def sleep(self):
         """Put the screen into low current mode."""
@@ -93,7 +93,11 @@ class Screen:
         self._buffer.write_text(text, x, y, self._buffer.BLACK,
                                 scale, scale, None, pen)
 
-    def _update_screen(self):
+    def _update_screen(self, fullupdate):
+        if fullupdate:
+            self._e.set_lut(self._e.LUT_FULL_UPDATE)
+        else:
+            self._e.set_lut(self._e.LUT_PARTIAL_UPDATE)
         self._e.set_frame_memory(self._buffer.get(), 0, 0,
                                  epaper2in9.EPD_WIDTH, epaper2in9.EPD_HEIGHT)
         self._e.display_frame()

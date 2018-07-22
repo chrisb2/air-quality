@@ -26,6 +26,9 @@ def run():
     if _isFirstRun():
         _setRunsToCondition(CONDITIONING_RUNS)
         ccs = ccs811.CCS811(i2c, mode=ccs811.CCS811.DRIVE_MODE_60SEC)
+        t, p, h = bme.read_data()
+        # Full update of Waveshare on power on
+        scr.update(t, h, None, None, bat.volts(), True)
     else:
         ccs = ccs811.CCS811(i2c, mode=None)
         _addRun()
