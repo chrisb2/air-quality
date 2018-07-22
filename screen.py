@@ -58,14 +58,20 @@ class Screen:
         self._write_value_text("%d%%" % int(round(humidity)), 158, 70)
 
     def _add_co2(self, co2):
-        # 400ppm to 8192ppm
+        # 400ppm to 32768ppm
         self._write_title_text("eCO2 ppm", 2, 48)
-        self._write_value_text("%d" % co2, 10, 5)
+        if co2 is None:
+            self._add_line(50, 25, 80, 25)
+        else:
+            self._write_value_text("%d" % co2, 10, 5)
 
     def _add_voc(self, voc):
-        # 0ppb to 1187ppb
+        # 0ppb to 32768ppb
         self._write_title_text("TVOC ppb", 152, 48)
-        self._write_value_text("%d" % voc, 158, 5)
+        if voc is None:
+            self._add_line(200, 25, 230, 25)
+        else:
+            self._write_value_text("%d" % voc, 158, 5)
 
     def _add_voltage(self, voltage):
         if voltage is not None:

@@ -12,6 +12,8 @@ from screen import Screen
 import battery
 import config
 
+CONDITIONING_RUNS = 20  # 20 runs (minutes), p9 of datasheet
+
 i2c = machine.I2C(scl=config.scl, sda=config.sda, freq=100000)
 bme = bme280.BME280(i2c=i2c, mode=bme280.BME280_OSAMPLE_4)
 rtc = machine.RTC()
@@ -21,21 +23,21 @@ bat = battery.Battery(config.battery)
 
 def run():
     """Main entry point to execute this program."""
-    memory = rtc.memory()
-    if len(memory) == 0 or memory[0] == 0x00:
-        rtc.memory(bytes([0x01]))
+    if _isFirstRun():
+        _setRunsToCondition(CONDITIONING_RUNS)
         ccs = CCS811(i2c, mode=CCS811.DRIVE_MODE_60SEC)
     else:
         ccs = CCS811(i2c, mode=None)
-        # updated wake count
+        _addRun()
 
         try:
             ccs.read()
             t, p, h = bme.read_data()
             ccs.put_envdata(t, h)
-            scr.update(t, h, ccs.eco2, ccs.tvoc, bat.volts())
-            # if wake count > 20: # 20mins
-            #     put baseline to ccs811
+            if _isConditioned():
+                scr.update(t, h, ccs.eco2, ccs.tvoc, bat.volts())
+            else:
+                scr.update(t, h, None, None, bat.volts())
             print('eCO2: %dppm, TVOC: %dppb, %.1fC, %.1f%%RH' %
                   (ccs.eco2, ccs.tvoc, t, h))
         except OSError as e:
@@ -46,6 +48,23 @@ def run():
     machine.deepsleep()
 
 
-def reinitialize():
-    """Re-initialize state of ccs811 sensor."""
-    machine.RTC.memory(bytes([0x00]))
+def _setRunsToCondition(run_count):
+    """Set number of runs (minutes) required to condition ccs811 sensor."""
+    rtc.memory(bytes([run_count]))
+
+
+def _isFirstRun():
+    memory = rtc.memory()
+    return len(memory) == 0
+
+
+def _isConditioned():
+    memory = rtc.memory()
+    return memory[0] == 0
+
+
+def _addRun():
+    # Decrement run count in first 20mins of running
+    memory = rtc.memory()
+    if memory[0] != 0:
+        rtc.memory(bytes([memory[0] - 1]))
