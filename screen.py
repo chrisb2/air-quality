@@ -22,6 +22,7 @@ class Screen:
         self._e = epaper2in9.EPD(spi, config.cs, config.dc,
                                  config.rst1, config.busy)
         self._e.init()
+        self._e.set_lut(self._e.LUT_PARTIAL_UPDATE)
         self._buffer = Buffer(epaper2in9.EPD_WIDTH, epaper2in9.EPD_HEIGHT)
 
     def update(self, temperature, humidity, co2, voc, voltage):

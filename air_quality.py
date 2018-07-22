@@ -6,9 +6,9 @@ the values on a 2.9in Waveshare e-Paper display.
 """
 import machine
 import esp32
-from ccs811 import CCS811
+import ccs811
 import bme280
-from screen import Screen
+import screen
 import battery
 import config
 
@@ -17,7 +17,7 @@ CONDITIONING_RUNS = 20  # 20 runs (minutes), p9 of datasheet
 i2c = machine.I2C(scl=config.scl, sda=config.sda, freq=100000)
 bme = bme280.BME280(i2c=i2c, mode=bme280.BME280_OSAMPLE_4)
 rtc = machine.RTC()
-scr = Screen(config)
+scr = screen.Screen(config)
 bat = battery.Battery(config.battery)
 
 
@@ -25,9 +25,9 @@ def run():
     """Main entry point to execute this program."""
     if _isFirstRun():
         _setRunsToCondition(CONDITIONING_RUNS)
-        ccs = CCS811(i2c, mode=CCS811.DRIVE_MODE_60SEC)
+        ccs = ccs811.CCS811(i2c, mode=ccs811.CCS811.DRIVE_MODE_60SEC)
     else:
-        ccs = CCS811(i2c, mode=None)
+        ccs = ccs811.CCS811(i2c, mode=None)
         _addRun()
 
         try:
