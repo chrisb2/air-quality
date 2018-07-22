@@ -29,4 +29,8 @@ The battery voltage is displayed in the top right hand corner of the display.
 
 **WARNING - DO THIS AT YOUR OWN RISK, IT MAY BRICK THE SENSOR**
 
-The Python program _ccs811_firmware_upgrade.py_ can be used to upgrade the CCS811 firmware, it is based on the ams application note AN000371: Downloading new Application Firmware (v2). Download the firmware binary from the ams website, copy to the esp32 and run the program.
+The Python program _ccs811_firmware_upgrade.py_ can be used to upgrade the CCS811 firmware, it is based on the ams application note AN000371: Downloading new Application Firmware (v2).
+
+Check the current application firmware version in the sensor as described in the datasheet.
+
+Download the new firmware binary from the ams website, copy to the esp32 and run the program.
