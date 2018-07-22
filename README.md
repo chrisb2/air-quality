@@ -11,7 +11,7 @@ If the schematic appears to be missing details, download it and view it locally,
 
 The program has been written and tested with the standard [esp32 Micropython firmware](http://micropython.org/download#esp32) installed on a [Lolin D32](https://wiki.wemos.cc/products:d32:d32) development board, although with some adjustments I would expect it to work on other esp32 boards and on the esp8266.
 
-To install; flash the standard esp32 Micropython firmware, then copy all the Python files to the esp32, then reset the esp32.
+To install; flash the standard esp32 Micropython firmware, then copy all the Python files to the esp32 and reset the esp32.
 
 ## Usage
 
@@ -24,3 +24,9 @@ The display is refreshed once per minute with the esp32 and display in deep slee
 ![Example Display](./screen-example.jpg)
 
 The battery voltage is displayed in the top right hand corner of the display.
+
+## CCS811 Firmware Upgrade
+
+**WARNING - DO THIS AT YOUR OWN RISK, IT MAY BRICK THE SENSOR**
+
+The Python program _ccs811_firmware_upgrade.py_ can be used to upgrade the CCS811 firmware, it is based on the ams application note AN000371: Downloading new Application Firmware (v2). Download the firmware binary from the ams website, copy to the esp32 and run the program.

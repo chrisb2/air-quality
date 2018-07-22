@@ -1,5 +1,9 @@
-"""Program to upgrade the firmware of the ccs811 sensor."""
-from machine import I2C
+"""Program to upgrade the firmware of the ccs811 sensor.
+
+Based on ams application note AN000371: Downloading new Application
+Firmware (v2)
+"""
+from machine import I2C, Pin
 import utime
 import config
 import uio
@@ -15,7 +19,7 @@ def firmware_upgrade(firmware_file):
 
     For example: firmware_upgrade('CCS811_SW000246_1-00.bin')
     """
-    reset = config.rst2
+    reset = Pin(config.rst2)
     wake = config.wake
 
     # Pulse Reset pin
@@ -49,7 +53,7 @@ def firmware_upgrade(firmware_file):
             # i2c.writeto_mem(ADDRESS, 0xf2, bytearray(bytes))
             utime.sleep_ms(50)
 
-    # Verify application - this does not work always returns 0
+    # Verify application - this does not work, always prints 0
     # Power off to complete
     print("Verify...")
     i2c.writeto_mem(ADDRESS, 0xf3, bytearray([0x01]))
