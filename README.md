@@ -17,7 +17,7 @@ To install; flash the standard esp32 Micropython firmware, then copy all the Pyt
 
 The CCS811 sensor must be 'burned-in' (see data sheet) for at least 1 hour (newer CCS811 firmware), or 48 hours (older CCS811 firmware). To do this simply leave powered on for the appropriate time.
 
-In addition the CCS811 sensor must be 'conditioned' for 20 minutes before accurate reading are generated (see data sheet). During this period the display will show a long dash for the eCO<sub>2</sub> and TVOC values.
+In addition the CCS811 sensor must be 'conditioned' for 20 minutes before accurate readings are generated (see data sheet). During this period the display will show a long dash for the eCO<sub>2</sub> and TVOC values.
 
 The display is refreshed once per minute with the esp32 and display in deep sleep in the interval between refreshes.
 
