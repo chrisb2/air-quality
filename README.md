@@ -34,3 +34,13 @@ The Python program _ccs811_firmware_upgrade.py_ can be used to upgrade the CCS81
 Check the current application firmware version in the sensor as described in the datasheet.
 
 Download the new firmware binary from the ams website, copy to the esp32 and run the program.
+
+## Acknowledgements
+
+CCS811 module based on [Notthemarsian/CCS811](https://github.com/Notthemarsian/CCS811)
+
+BME280 module based on [catdog2/mpy_bme280_esp8266](https://github.com/catdog2/mpy_bme280_esp8266)
+
+e-Paper module based on [mcauser/micropython-waveshare-epaper](https://github.com/mcauser/micropython-waveshare-epaper/blob/master/epaper2in9.py)
+
+Hershey vector font from [Experimenting with E-Paper Displays: Building a Clock!](https://www.element14.com/community/groups/open-source-hardware/blog/2017/12/31/experimenting-with-e-paper-displays-building-a-clock)

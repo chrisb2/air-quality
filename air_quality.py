@@ -6,6 +6,7 @@ the values on a 2.9in Waveshare e-Paper display.
 """
 import machine
 import esp32
+import utime
 import ccs811
 import bme280
 import screen
@@ -46,6 +47,7 @@ def run():
         except OSError as e:
             print(e)
 
+    _flashled()
     scr.sleep()
     esp32.wake_on_ext0(pin=config.int, level=0)
     machine.deepsleep()
@@ -71,3 +73,10 @@ def _addRun():
     memory = rtc.memory()
     if memory[0] != 0:
         rtc.memory(bytes([memory[0] - 1]))
+
+
+def _flashled():
+    led = machine.Pin(5, machine.Pin.OUT)
+    led.value(0)
+    utime.sleep_ms(100)
+    led.value(1)
