@@ -17,7 +17,7 @@ To install; flash the standard esp32 Micropython firmware, then copy all the Pyt
 
 The CCS811 sensor must be 'burned-in' (see data sheet) for at least 1 hour (newer CCS811 firmware), or 48 hours (older CCS811 firmware). To do this simply leave powered on for the appropriate time.
 
-In addition the CCS811 sensor must be 'conditioned' for 20 minutes before accurate readings are generated (see data sheet). During this period the display will show a long dash for the eCO<sub>2</sub> and TVOC values.
+In addition the CCS811 sensor must be 'conditioned' for 20 minutes after being powered on before accurate readings are generated (see data sheet). During this period the display will show a long dash for the eCO<sub>2</sub> and TVOC values.
 
 The display is refreshed once per minute with the esp32 and display in deep sleep in the interval between refreshes.
 
@@ -43,4 +43,4 @@ BME280 module based on [catdog2/mpy_bme280_esp8266](https://github.com/catdog2/m
 
 e-Paper module based on [mcauser/micropython-waveshare-epaper](https://github.com/mcauser/micropython-waveshare-epaper/blob/master/epaper2in9.py)
 
-Hershey vector font from [Experimenting with E-Paper Displays: Building a Clock!](https://www.element14.com/community/groups/open-source-hardware/blog/2017/12/31/experimenting-with-e-paper-displays-building-a-clock)
+[Hershey](http://paulbourke.net/dataformats/hershey/) vector font from [Experimenting with E-Paper Displays: Building a Clock!](https://www.element14.com/community/groups/open-source-hardware/blog/2017/12/31/experimenting-with-e-paper-displays-building-a-clock)
