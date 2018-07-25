@@ -13,70 +13,74 @@ import screen
 import battery
 import config
 
-CONDITIONING_RUNS = 20  # 20 runs (minutes), p9 of datasheet
-
-i2c = machine.I2C(scl=config.scl, sda=config.sda, freq=100000)
-bme = bme280.BME280(i2c=i2c, mode=bme280.BME280_OSAMPLE_4)
-rtc = machine.RTC()
-scr = screen.Screen(config)
-bat = battery.Battery(config.battery)
+_i2c = machine.I2C(scl=config.scl, sda=config.sda, freq=100000)
+_rtc = machine.RTC()
+_bat = battery.Battery(config.battery)
 
 
 def run():
     """Main entry point to execute this program."""
-    if _isFirstRun():
-        _setRunsToCondition(CONDITIONING_RUNS)
-        ccs = ccs811.CCS811(i2c, mode=ccs811.CCS811.DRIVE_MODE_60SEC)
-        t, p, h = bme.read_data()
-        # Full update of Waveshare on power on
-        scr.update(t, h, None, None, bat.volts(), True)
-    else:
-        ccs = ccs811.CCS811(i2c, mode=None)
-        _addRun()
+    try:
+        bme = bme280.BME280(i2c=_i2c, mode=bme280.BME280_OSAMPLE_4)
+        scr = screen.Screen(config)
 
-        try:
+        if _is_first_run():
+            # 20 runs (minutes), p9 of datasheet
+            _set_runs_to_condition(20)
+            ccs = ccs811.CCS811(_i2c, mode=ccs811.CCS811.DRIVE_MODE_60SEC)
+            t, p, h = bme.read_data()
+            # Full update of Waveshare on power on
+            scr.update(t, h, None, None, _bat.volts(), True)
+        else:
+            ccs = ccs811.CCS811(_i2c, mode=None)
+            _add_run()
             ccs.read()
             t, p, h = bme.read_data()
             ccs.put_envdata(t, h)
-            if _isConditioned():
-                scr.update(t, h, ccs.eco2, ccs.tvoc, bat.volts())
+            if _is_conditioned():
+                scr.update(t, h, ccs.eco2, ccs.tvoc, _bat.volts())
             else:
-                scr.update(t, h, None, None, bat.volts())
+                scr.update(t, h, None, None, _bat.volts())
             print('eCO2: %dppm, TVOC: %dppb, %.1fC, %.1f%%RH' %
                   (ccs.eco2, ccs.tvoc, t, h))
-        except OSError as e:
-            print(e)
 
-    _flashled()
-    scr.sleep()
+        scr.sleep()
+        _flash_led()
+    except Exception as e:
+        _flash_led(3)
+        print(e)
+
     esp32.wake_on_ext0(pin=config.int, level=0)
     machine.deepsleep()
 
 
-def _setRunsToCondition(run_count):
+def _set_runs_to_condition(run_count):
     """Set number of runs (minutes) required to condition ccs811 sensor."""
-    rtc.memory(bytes([run_count]))
+    _rtc.memory(bytes([run_count]))
 
 
-def _isFirstRun():
-    memory = rtc.memory()
+def _is_first_run():
+    memory = _rtc.memory()
     return len(memory) == 0
 
 
-def _isConditioned():
-    memory = rtc.memory()
+def _is_conditioned():
+    memory = _rtc.memory()
     return memory[0] == 0
 
 
-def _addRun():
+def _add_run():
     # Decrement run count in first 20mins of running
-    memory = rtc.memory()
+    memory = _rtc.memory()
     if memory[0] != 0:
-        rtc.memory(bytes([memory[0] - 1]))
+        _rtc.memory(bytes([memory[0] - 1]))
 
 
-def _flashled():
+def _flash_led(count=1):
+    # Built in LED on Lolin D32
     led = machine.Pin(5, machine.Pin.OUT)
-    led.value(0)
-    utime.sleep_ms(100)
-    led.value(1)
+    for _ in range(0, count):
+        led.value(0)
+        utime.sleep_ms(100)
+        led.value(1)
+        utime.sleep_ms(100)

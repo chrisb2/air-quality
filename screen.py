@@ -19,13 +19,13 @@ class Screen:
         """Create with the supplied configuration."""
         spi = SPI(-1, baudrate=config.baudrate,
                   sck=config.sck, mosi=config.mosi, miso=config.miso)
-        self._e = epaper2in9.EPD(spi, config.cs, config.dc,
-                                 config.rst1, config.busy)
-        self._e.init()
-        self._e.set_lut(self._e.LUT_PARTIAL_UPDATE)
+        self._epd = epaper2in9.EPD(spi, config.cs, config.dc,
+                                   config.rst1, config.busy)
+        self._epd.init()
         self._buffer = Buffer(epaper2in9.EPD_WIDTH, epaper2in9.EPD_HEIGHT)
 
-    def update(self, temperature, humidity, co2, voc, voltage, fullupdate=False):
+    def update(self, temperature, humidity, co2, voc, voltage,
+               fullupdate=False):
         """Update the screen with the supplied readings."""
         self._add_borders()
         self._add_temperature(temperature)
@@ -37,7 +37,7 @@ class Screen:
 
     def sleep(self):
         """Put the screen into low current mode."""
-        self._e.sleep()
+        self._epd.sleep()
 
     def _add_borders(self):
         self._buffer.background(self._buffer.WHITE)
@@ -95,9 +95,9 @@ class Screen:
 
     def _update_screen(self, fullupdate):
         if fullupdate:
-            self._e.set_lut(self._e.LUT_FULL_UPDATE)
+            self._epd.set_lut(self._epd.LUT_FULL_UPDATE)
         else:
-            self._e.set_lut(self._e.LUT_PARTIAL_UPDATE)
-        self._e.set_frame_memory(self._buffer.get(), 0, 0,
-                                 epaper2in9.EPD_WIDTH, epaper2in9.EPD_HEIGHT)
-        self._e.display_frame()
+            self._epd.set_lut(self._epd.LUT_PARTIAL_UPDATE)
+        self._epd.set_frame_memory(self._buffer.get(), 0, 0,
+                                   epaper2in9.EPD_WIDTH, epaper2in9.EPD_HEIGHT)
+        self._epd.display_frame()

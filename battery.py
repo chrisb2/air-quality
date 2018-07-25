@@ -5,6 +5,7 @@ from machine import ADC
 class Battery:
     """Reads the battery voltage of the Lolin D32 development board."""
 
+    # See Lolin D32 schematic 'Battery' section
     _RESISTOR_RATIO = (100000 + 100000) / 100000
     _ADC_READS = 100
 
