@@ -11,11 +11,13 @@ import ccs811
 import bme280
 import screen
 import battery
+import baseline
 import config
 
 _i2c = machine.I2C(scl=config.scl, sda=config.sda, freq=100000)
 _rtc = machine.RTC()
 _bat = battery.Battery(config.battery)
+_baseline = baseline.Baseline()
 
 
 def run():
@@ -37,8 +39,19 @@ def run():
             ccs.read()
             t, p, h = bme.read_data()
             ccs.put_envdata(t, h)
-            if _is_conditioned():
-                scr.update(t, h, ccs.eco2, ccs.tvoc, _bat.volts())
+
+            if _ccs811_is_conditioned():
+                # Stored baseline should only be loaded after conditioning
+                if not _ccs811_baseline_is_loaded() and _baseline.exists():
+                    ccs.put_baseline(_baseline.retrieve())
+                    _set_ccs811_baseline_loaded()
+                    scr.update(t, h, None, None, _bat.volts())
+                else:
+                    scr.update(t, h, ccs.eco2, ccs.tvoc, _bat.volts())
+                if _new_ccs811_baseline_requested():
+                    baseline = ccs.get_baseline()
+                    _baseline.store(baseline)
+                    print('ccs811 base line %d stored' % baseline)
             else:
                 scr.update(t, h, None, None, _bat.volts())
             print('eCO2: %dppm, TVOC: %dppb, %.1fC, %.1f%%RH' %
@@ -64,9 +77,23 @@ def _is_first_run():
     return len(memory) == 0
 
 
-def _is_conditioned():
+def _ccs811_is_conditioned():
     memory = _rtc.memory()
     return memory[0] == 0
+
+
+def _ccs811_baseline_is_loaded():
+    memory = _rtc.memory()
+    return len(memory) > 1 and memory[1] == 1
+
+
+def _set_ccs811_baseline_loaded():
+    memory = _rtc.memory()
+    _rtc.memory(bytes([memory[0], 1]))
+
+
+def _new_ccs811_baseline_requested():
+    return config.sw1.value() == 0
 
 
 def _add_run():

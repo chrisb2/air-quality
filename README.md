@@ -25,6 +25,12 @@ The display is refreshed once per minute with the esp32 and display in deep slee
 
 The battery voltage is displayed in the top right hand corner of the display.
 
+### ccs811 Baseline
+
+The ccs811 sensor has the ability to use a predetermined baseline against which new readings are calculated, this allows a baseline obtained in clean air to be used to measure values in a more polluted environment.
+
+Place the device in clean air and wait for it to be 'conditioned' (readings for eCO<sub>2</sub> are TVOC displayed). Operate switch 1 to the on position (connects pin 14 to GND) and wait for next display update (LED on Lolin D32 flashes), turn switch 1 off. The baseline is now stored and will be utilized every time the device is switch on. A new baseline can be set by repeating this process as required.
+
 ## CCS811 Firmware Upgrade
 
 **WARNING - DO THIS AT YOUR OWN RISK, IT MAY BRICK THE SENSOR**
