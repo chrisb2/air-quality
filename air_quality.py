@@ -43,17 +43,20 @@ def run():
             if _ccs811_is_conditioned():
                 # Stored baseline should only be loaded after conditioning
                 if not _ccs811_baseline_is_loaded() and _baseline.exists():
-                    ccs.put_baseline(_baseline.retrieve())
+                    baseline = _baseline.retrieve()
+                    ccs.put_baseline(baseline)
                     _set_ccs811_baseline_loaded()
                     scr.update(t, h, None, None, _bat.volts())
+                    print('ccs811 baseline %d loaded' % baseline)
                 else:
                     scr.update(t, h, ccs.eco2, ccs.tvoc, _bat.volts())
                 if _new_ccs811_baseline_requested():
                     baseline = ccs.get_baseline()
                     _baseline.store(baseline)
-                    print('ccs811 base line %d stored' % baseline)
+                    print('ccs811 baseline %d stored' % baseline)
             else:
                 scr.update(t, h, None, None, _bat.volts())
+
             print('eCO2: %dppm, TVOC: %dppb, %.1fC, %.1f%%RH' %
                   (ccs.eco2, ccs.tvoc, t, h))
 
