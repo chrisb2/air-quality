@@ -57,8 +57,8 @@ def run():
             else:
                 scr.update(t, h, None, None, _bat.volts())
 
-            print('eCO2: %dppm, TVOC: %dppb, %.1fC, %.1f%%RH' %
-                  (ccs.eco2, ccs.tvoc, t, h))
+            print('eCO2: %dppm, TVOC: %dppb, %.1fC, %.1f%%RH, baseline: %r' %
+                  (ccs.eco2, ccs.tvoc, t, h, _ccs811_baseline_is_loaded()))
 
         scr.sleep()
         _flash_led()

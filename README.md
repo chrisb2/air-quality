@@ -19,7 +19,7 @@ The CCS811 sensor must be 'burned-in' (see data sheet) for at least 1 hour (newe
 
 In addition the CCS811 sensor must be 'conditioned' for 20 minutes after being powered on before accurate readings are generated (see data sheet). During this period the display will show a long dash for the eCO<sub>2</sub> and TVOC values.
 
-The display is refreshed once per minute with the esp32 and display in deep sleep in the interval between refreshes.
+The display is refreshed once per minute with the esp32, ccs811 MCU and display sleeping in the interval between refreshes.
 
 ![Example Display](./screen-example.jpg)
 

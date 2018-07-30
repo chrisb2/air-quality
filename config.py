@@ -15,8 +15,8 @@ busy = Pin(17)  # Marked BUSY on Waveshare
 scl = Pin(26)
 sda = Pin(27)
 # Following are CCS811 only
-wake = Pin(33, Pin.OUT)
-int = Pin(34, Pin.IN, Pin.PULL_UP)  # pulled down by CCS811
+wake = Pin(33, Pin.OUT, value=0)  # Wake ccs811 by default, datasheet figure 4
+int = Pin(34, Pin.IN, Pin.PULL_UP)  # Pulled down by CCS811
 rst2 = 25  # Pin number only, create Pin when needed
 
 # Battery measurement pin on Lolin D32 development board
