@@ -32,7 +32,7 @@ def run():
             ccs = ccs811.CCS811(_i2c, mode=ccs811.CCS811.DRIVE_MODE_60SEC)
             t, p, h = bme.read_data()
             # Full update of Waveshare on power on
-            scr.update(t, h, None, None, _bat.volts(), True)
+            scr.update(t, h, None, None, _bat.volts(), False, True)
         else:
             ccs = ccs811.CCS811(_i2c, mode=None)
             _add_run()
@@ -49,7 +49,8 @@ def run():
                     scr.update(t, h, None, None, _bat.volts())
                     print('ccs811 baseline %d loaded' % baseline)
                 else:
-                    scr.update(t, h, ccs.eco2, ccs.tvoc, _bat.volts())
+                    scr.update(t, h, ccs.eco2, ccs.tvoc, _bat.volts(),
+                               _ccs811_baseline_is_loaded())
                 if _new_ccs811_baseline_requested():
                     baseline = ccs.get_baseline()
                     _baseline.store(baseline)

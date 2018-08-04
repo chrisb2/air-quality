@@ -22,7 +22,7 @@ rst2 = 25  # Pin number only, create Pin when needed
 # Battery measurement pin on Lolin D32 development board
 battery = Pin(35)
 
-# Control Switches (sw4 is power)
+# Control Switches
 sw1 = Pin(14, Pin.IN, Pin.PULL_UP)  # pulled down by switch
 sw2 = Pin(12)
 sw3 = Pin(13)

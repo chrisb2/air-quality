@@ -25,7 +25,7 @@ class Screen:
         self._buffer = Buffer(epaper2in9.EPD_WIDTH, epaper2in9.EPD_HEIGHT)
 
     def update(self, temperature, humidity, co2, voc, voltage,
-               fullupdate=False):
+               baseline=False, fullupdate=False):
         """Update the screen with the supplied readings."""
         self._add_borders()
         self._add_temperature(temperature)
@@ -33,6 +33,7 @@ class Screen:
         self._add_co2(co2)
         self._add_voc(voc)
         self._add_voltage(voltage)
+        self._add_baseline_indicator(baseline)
         self._update_screen(fullupdate)
 
     def sleep(self):
@@ -81,6 +82,11 @@ class Screen:
             self._buffer.line(272, 118, epaper2in9.EPD_HEIGHT, 118,
                               self._buffer.BLACK, self._buffer.PEN_THIN)
             self._write_text("%.1fV" % voltage, 274, 120, self._TINY_TEXT,
+                             self._buffer.PEN_THIN)
+
+    def _add_baseline_indicator(self, baseline):
+        if baseline:
+            self._write_text("B", 288, 2, self._TINY_TEXT,
                              self._buffer.PEN_THIN)
 
     def _write_title_text(self, text, x, y):
