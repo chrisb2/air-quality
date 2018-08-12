@@ -26,6 +26,9 @@ def run():
         bme = bme280.BME280(i2c=_i2c, mode=bme280.BME280_OSAMPLE_4)
         scr = screen.Screen(config)
 
+        if _delete_ccs811_baseline_requested():
+            _baseline.delete()
+
         if _is_first_run():
             # 20 runs (minutes), p9 of datasheet
             _set_runs_to_condition(20)
@@ -98,6 +101,10 @@ def _set_ccs811_baseline_loaded():
 
 def _new_ccs811_baseline_requested():
     return config.sw1.value() == 0
+
+
+def _delete_ccs811_baseline_requested():
+    return config.sw2.value() == 0
 
 
 def _add_run():

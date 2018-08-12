@@ -1,5 +1,6 @@
 """Store and retreive environment baseline values for the ccs811 sensor."""
 import uio
+import uos
 
 
 class Baseline:
@@ -24,3 +25,10 @@ class Baseline:
         """Retrieve baseline integer value."""
         with uio.open(self._BASELINE_FILE, mode='r') as baseline_file:
             return int(baseline_file.readline())
+
+    def delete(self):
+        """Delete the baseline."""
+        try:
+            uos.remove(self._BASELINE_FILE)
+        except OSError:
+            pass
