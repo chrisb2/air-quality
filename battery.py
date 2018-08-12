@@ -7,6 +7,7 @@ class Battery:
 
     # See Lolin D32 schematic 'Battery' section
     _RESISTOR_RATIO = (100000 + 100000) / 100000
+    _REFERENCE_VOLTAGE = 3.296  # measured for individual Lolin D32
     _ADC_READS = 100
 
     def __init__(self, adcpin):
@@ -20,4 +21,5 @@ class Battery:
         sum = 0
         for x in range(0, self._ADC_READS):
             sum += adc.read()
-        return self._RESISTOR_RATIO * (sum * 3.9 / 4096 / self._ADC_READS)
+        return self._RESISTOR_RATIO * (sum * self._REFERENCE_VOLTAGE / 4096 /
+                                       self._ADC_READS)
